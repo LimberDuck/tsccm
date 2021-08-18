@@ -27,7 +27,9 @@ jobs:
         run: |
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Build package
-        run: python -m build
+        run: |
+          ls -la
+          python -m build
       - name: Install locally
         run: |
           ls
