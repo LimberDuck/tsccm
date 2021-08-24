@@ -2,7 +2,7 @@
 
 **TSCCM** *(Tenable.SC CLI Manager)* by LimberDuck is a CLI tool which enables you to perform certain actions on Tenable.SC by (C) Tenable, Inc. via [Tenable.SC API](https://docs.tenable.com/tenablesc/api).
 
-[![License](https://img.shields.io/github/license/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm/blob/master/LICENSE) [![Repo size](https://img.shields.io/github/repo-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Code size](https://img.shields.io/github/languages/code-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Supported platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey.svg)](https://github.com/LimberDuck/tsccm)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/tsccm?logo=PyPI)](https://pypi.org/project/tsccm/) [![License](https://img.shields.io/github/license/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm/blob/master/LICENSE) [![Repo size](https://img.shields.io/github/repo-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Code size](https://img.shields.io/github/languages/code-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Supported platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey.svg)](https://github.com/LimberDuck/tsccm)
 
 
 Main features
