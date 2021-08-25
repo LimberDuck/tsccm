@@ -10,6 +10,7 @@ import platform
 import sys
 from tenable.errors import ConnectionError
 from oauthlib.oauth2.rfc6749.errors import CustomOAuth2Error
+import datetime
 
 os_user = getpass.getuser().lower()
 
@@ -23,13 +24,16 @@ _login_options = [
     click.option('--address', '-a', default=["127.0.0.1"], multiple=True, prompt='address',
                  help='address to which you want to login',
                  show_default="127.0.0.1"),
+    click.option('--port', default="443",
+                 help='port to which you want to login',
+                 show_default="443"),
     click.option('--username', '-u', default=os_user, prompt='username',
                  help='username which you want to use to login',
                  show_default="current user"),
     click.option('--password', '-p',
                  help='password which you want to use to login'),
-    click.option('--verify',
-                 help="Set to False if you don't want to verify SSL certificate"),
+    click.option('--insecure', '-k', is_flag=True,
+                 help="perform insecure SSL connections and transfers"),
     click.option('--format', '-f', default='table',
                  help='data format to display [table,json]',
                  show_default="table")
@@ -144,16 +148,20 @@ def cli():
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
+@click.option('--status', is_flag=True,
+              help="Get server status")
 @click.option('--ips', is_flag=True,
               help="Use to see number of licensed IPs, active IPs and left IPs")
-def status(address, username, password, verify, format, ips, verbose):
-    """get Tenable.SC status info"""
+@click.option('--version', is_flag=True,
+              help="Get server version")
+def server(address, port, username, password, insecure, format, status, ips, version, verbose):
+    """get Tenable.SC server info"""
 
     for one_address in address:
         one_password = password_check(one_address, username, password, verbose)
 
         try:
-            sccon = TscApi(one_address, verify)
+            sccon = TscApi(one_address, port, insecure)
             sccon.login(username, one_password)
         except ConnectionError as e:
             print("Can't reach Tenable.sc API via {} "
@@ -165,23 +173,25 @@ def status(address, username, password, verify, format, ips, verbose):
                       "Please make sure they are correct.")
             sys.exit(1)
 
-        status = sccon.status()['response']
+        status_info = sccon.status_get()['response']
+        system_info = sccon.system_get()['response']
 
-        licensed_ips = status['licensedIPs']
-        active_ips = status['activeIPs']
+        licensed_ips = status_info['licensedIPs']
+        active_ips = status_info['activeIPs']
         left_ips = int(licensed_ips) - int(active_ips)
         left_ips_percentage = str(int(100 - 100 * int(active_ips) / int(licensed_ips)))
 
         if ips:
             print(one_address + ' ' + '{0:}'.format(int(licensed_ips)) + ' - ' + '{0:}'.format(int(active_ips))
                   + ' = ' + '{0:}'.format(left_ips) + ' (' + left_ips_percentage + '%) remaining IPs')
+        elif version:
+            system_info_version = system_info['version']
+            print(one_address, system_info_version)
+        elif status:
+            status_info_jobd = status_info['jobd']
+            print(one_address, status_info_jobd)
         else:
-            jobd_status = status['jobd']
-            system_info = sccon.system()
-            system_info_version = system_info['response']['version']
-
-            system_info_build_id = system_info['response']['buildID']
-            print(one_address, jobd_status, system_info_version, system_info_build_id)
+            print("No option given!")
 
         sccon.logout()
 
@@ -191,14 +201,14 @@ def status(address, username, password, verify, format, ips, verbose):
 @add_options(_general_options)
 @click.option('--list', is_flag=True,
               help="Get users list")
-def user(address, username, password, verify, format, list, verbose):
+def user(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC user info"""
 
     for one_address in address:
         one_password = password_check(one_address, username, password, verbose)
 
         try:
-            sccon = TscApi(one_address, verify)
+            sccon = TscApi(one_address, port, insecure)
             sccon.login(username, one_password)
         except ConnectionError as e:
             print("Can't reach Tenable.sc API via {} "
@@ -212,11 +222,20 @@ def user(address, username, password, verify, format, list, verbose):
         if list:
             print(one_address)
             users_on_tenablesc = sccon.user_get()['response']
+            users_on_tenablesc = [{
+                'id': k['id'],
+                'username': k['username'],
+                'firstname': k['firstname'],
+                'lastname': k['lastname'],
+                'roleName': k['role']['name'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+                'lastLogin': datetime.datetime.fromtimestamp(int(k['lastLogin'])),
+            } for k in users_on_tenablesc]
             if format == 'table':
-                print(dataframe_table(users_on_tenablesc))
+                print(dataframe_table(users_on_tenablesc),'\n')
             else:
                 print(users_on_tenablesc)
-
         else:
             print("No option given!")
 
@@ -228,14 +247,14 @@ def user(address, username, password, verify, format, list, verbose):
 @add_options(_general_options)
 @click.option('--list', is_flag=True,
               help="Get groups list")
-def group(address, username, password, verify, format, list, verbose):
+def group(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC group info"""
 
     for one_address in address:
         one_password = password_check(one_address, username, password, verbose)
 
         try:
-            sccon = TscApi(one_address, verify)
+            sccon = TscApi(one_address, port, insecure)
             sccon.login(username, one_password)
         except ConnectionError as e:
             print("Can't reach Tenable.sc API via {}. Please check your connection.".format(one_address))
@@ -248,6 +267,12 @@ def group(address, username, password, verify, format, list, verbose):
         if list:
             print(one_address)
             groups_on_tenablesc = sccon.group_get()['response']
+            groups_on_tenablesc = [{
+                'id': k['id'],
+                'name': k['name'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+            } for k in groups_on_tenablesc]
             if format == 'table':
                 print(dataframe_table(groups_on_tenablesc))
             else:
@@ -263,14 +288,14 @@ def group(address, username, password, verify, format, list, verbose):
 @add_options(_general_options)
 @click.option('--list', is_flag=True,
               help="Get active scans list")
-def scan(address, username, password, verify, format, list, verbose):
+def scan(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC active scan info"""
 
     for one_address in address:
         one_password = password_check(one_address, username, password, verbose)
 
         try:
-            sccon = TscApi(one_address, verify)
+            sccon = TscApi(one_address, port, insecure)
             sccon.login(username, one_password)
         except ConnectionError as e:
             print("Can't reach Tenable.sc API via {}. Please check your connection.".format(one_address))
@@ -282,8 +307,14 @@ def scan(address, username, password, verify, format, list, verbose):
 
         if list:
             print(one_address)
-            scans_on_tenablesc = sccon.scan_get()['response']['usable']
-
+            scans_on_tenablesc = sccon.scan_get()['response']['manageable']
+            scans_on_tenablesc = [{
+                'id': k['id'],
+                'name': k['name'],
+                'ownerUsername': k['owner']['username'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+            } for k in scans_on_tenablesc]
             if format == 'table':
                 print(dataframe_table(scans_on_tenablesc))
                 pass
@@ -301,14 +332,14 @@ def scan(address, username, password, verify, format, list, verbose):
 @add_options(_general_options)
 @click.option('--list', is_flag=True,
               help="Get scans results list")
-def scan_result(address, username, password, verify, format, list, verbose):
+def scan_result(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC scan result info"""
 
     for one_address in address:
         one_password = password_check(one_address, username, password, verbose)
 
         try:
-            sccon = TscApi(one_address, verify)
+            sccon = TscApi(one_address, port, insecure)
             sccon.login(username, one_password)
         except ConnectionError as e:
             print("Can't reach Tenable.sc API via {}. Please check your connection.".format(one_address))
@@ -320,7 +351,14 @@ def scan_result(address, username, password, verify, format, list, verbose):
 
         if list:
             print(one_address)
-            scans_on_tenablesc = sccon.scan_get()['response']['usable']
+            scans_on_tenablesc = sccon.scan_get()['response']['manageable']
+            scans_on_tenablesc = [{
+                'id': k['id'],
+                'name': k['name'],
+                'ownerUsername': k['owner']['username'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+            } for k in scans_on_tenablesc]
             if format == 'table':
                 print(dataframe_table(scans_on_tenablesc))
             else:
@@ -337,14 +375,14 @@ def scan_result(address, username, password, verify, format, list, verbose):
 @add_options(_general_options)
 @click.option('--list', is_flag=True,
               help="Get scan policies list")
-def policy(address, username, password, verify, format, list, verbose):
+def policy(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC policy info"""
 
     for one_address in address:
         one_password = password_check(one_address, username, password, verbose)
 
         try:
-            sccon = TscApi(one_address, verify)
+            sccon = TscApi(one_address, port, insecure)
             sccon.login(username, one_password)
         except ConnectionError as e:
             print("Can't reach Tenable.sc API via {}. Please check your connection.".format(one_address))
@@ -356,7 +394,14 @@ def policy(address, username, password, verify, format, list, verbose):
 
         if list:
             print(one_address)
-            scan_policies_on_tenablesc = sccon.policy_get()['response']['usable']
+            scan_policies_on_tenablesc = sccon.policy_get()['response']['manageable']
+            scan_policies_on_tenablesc = [{
+                'id': k['id'],
+                'name': k['name'],
+                'ownerUsername': k['owner']['username'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+            } for k in scan_policies_on_tenablesc]
             if format == 'table':
                 print(dataframe_table(scan_policies_on_tenablesc))
             else:
@@ -373,14 +418,14 @@ def policy(address, username, password, verify, format, list, verbose):
 @add_options(_general_options)
 @click.option('--list', is_flag=True,
               help="Get credentials list")
-def credential(address, username, password, verify, format, list, verbose):
+def credential(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC credential info"""
 
     for one_address in address:
         one_password = password_check(one_address, username, password, verbose)
 
         try:
-            sccon = TscApi(one_address, verify)
+            sccon = TscApi(one_address, port, insecure)
             sccon.login(username, one_password)
         except ConnectionError as e:
             print("Can't reach Tenable.sc API via {}. Please check your connection.".format(one_address))
@@ -392,11 +437,61 @@ def credential(address, username, password, verify, format, list, verbose):
 
         if list:
             print(one_address)
-            credentials_on_tenablesc = sccon.credential_get()['response']['usable']
+            credentials_on_tenablesc = sccon.credential_get()['response']['manageable']
+            credentials_on_tenablesc = [{
+                'id': k['id'],
+                'name': k['name'],
+                'ownerUsername': k['owner']['username'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+            } for k in credentials_on_tenablesc]
             if format == 'table':
                 print(dataframe_table(credentials_on_tenablesc))
             else:
                 print(credentials_on_tenablesc)
+
+        else:
+            print("No option given!")
+
+        sccon.logout()
+
+
+@cli.command()
+@add_options(_login_options)
+@add_options(_general_options)
+@click.option('--list', is_flag=True,
+              help="Get roles list")
+def role(address, port, username, password, insecure, format, list, verbose):
+    """get Tenable.SC role info"""
+
+    for one_address in address:
+        one_password = password_check(one_address, username, password, verbose)
+
+        try:
+            sccon = TscApi(one_address, port, insecure)
+            sccon.login(username, one_password)
+        except ConnectionError as e:
+            print("Can't reach Tenable.sc API via {}. Please check your connection.".format(one_address))
+            sys.exit(1)
+
+        except CustomOAuth2Error as e:
+            print("Can't login to Tenable.sc API with supplied credentials. Please make sure they are correct.")
+            sys.exit(1)
+
+        if list:
+            print(one_address)
+            roles_on_tenablesc = sccon.role_get()['response']
+            roles_on_tenablesc = [{
+                'id': k['id'],
+                'name': k['name'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+                'organizationCounts': k['organizationCounts'],
+            } for k in roles_on_tenablesc]
+            if format == 'table':
+                print(dataframe_table(roles_on_tenablesc), '\n')
+            else:
+                print(roles_on_tenablesc)
 
         else:
             print("No option given!")
