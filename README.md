@@ -9,6 +9,7 @@ Main features
 =============
 
 Initial version of **TSCCM** lets you get Tenable.SC's:
+* audit file list
 * credential list  
 * group list
 * policy list
