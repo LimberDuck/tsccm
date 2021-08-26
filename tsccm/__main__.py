@@ -35,7 +35,7 @@ _login_options = [
     click.option('--insecure', '-k', is_flag=True,
                  help="perform insecure SSL connections and transfers"),
     click.option('--format', '-f', default='table',
-                 help='data format to display [table,json]',
+                 help='data format to display [table,json,csv]',
                  show_default="table")
 ]
 
@@ -231,9 +231,13 @@ def user(address, port, username, password, insecure, format, list, verbose):
                 'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
                 'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
                 'lastLogin': datetime.datetime.fromtimestamp(int(k['lastLogin'])),
+                'locked': k['locked'],
+                'failedLogins': k['failedLogins'],
             } for k in users_on_tenablesc]
             if format == 'table':
                 print(dataframe_table(users_on_tenablesc),'\n')
+            elif format == 'csv':
+                print(dataframe_table(users_on_tenablesc).to_csv(), '\n')
             else:
                 print(users_on_tenablesc)
         else:
@@ -272,9 +276,12 @@ def group(address, port, username, password, insecure, format, list, verbose):
                 'name': k['name'],
                 'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
                 'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+                'userCount': k['userCount'],
             } for k in groups_on_tenablesc]
             if format == 'table':
-                print(dataframe_table(groups_on_tenablesc))
+                print(dataframe_table(groups_on_tenablesc), '\n')
+            elif format == 'csv':
+                print(dataframe_table(groups_on_tenablesc).to_csv(), '\n')
             else:
                 print(groups_on_tenablesc)
 
@@ -314,10 +321,16 @@ def scan(address, port, username, password, insecure, format, list, verbose):
                 'ownerUsername': k['owner']['username'],
                 'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
                 'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+                'scheduleType': k['schedule']['type'],
+                'scheduleEnabled': k['schedule']['enabled'],
+                'scheduleRepeatRule': k['schedule']['repeatRule'],
+                'scheduleStart': k['schedule']['start'],
+                'scheduleNextRun': datetime.datetime.fromtimestamp(int(k['schedule']['nextRun'])),
             } for k in scans_on_tenablesc]
             if format == 'table':
-                print(dataframe_table(scans_on_tenablesc))
-                pass
+                print(dataframe_table(scans_on_tenablesc), '\n')
+            elif format == 'csv':
+                print(dataframe_table(scans_on_tenablesc).to_csv(), '\n')
             else:
                 print(scans_on_tenablesc)
 
@@ -351,18 +364,26 @@ def scan_result(address, port, username, password, insecure, format, list, verbo
 
         if list:
             print(one_address)
-            scans_on_tenablesc = sccon.scan_get()['response']['manageable']
-            scans_on_tenablesc = [{
+            scan_results_on_tenablesc = sccon.scan_results_get()['response']['manageable']
+            scan_results_on_tenablesc = [{
                 'id': k['id'],
                 'name': k['name'],
                 'ownerUsername': k['owner']['username'],
                 'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
-                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
-            } for k in scans_on_tenablesc]
+                'status': k['status'],
+                'importStatus': k['importStatus'],
+                'totalIPs': k['totalIPs'],
+                'scannedIPs': k['scannedIPs'],
+                'startTime': datetime.datetime.fromtimestamp(int(k['startTime'])),
+                'finishTime': datetime.datetime.fromtimestamp(int(k['finishTime'])),
+                'scanDuration': str(datetime.timedelta(seconds=int(0 if int(k['scanDuration']) == -1 else k['scanDuration']))),
+            } for k in scan_results_on_tenablesc]
             if format == 'table':
-                print(dataframe_table(scans_on_tenablesc))
+                print(dataframe_table(scan_results_on_tenablesc), '\n')
+            elif format == 'csv':
+                print(dataframe_table(scan_results_on_tenablesc).to_csv(), '\n')
             else:
-                print(scans_on_tenablesc)
+                print(scan_results_on_tenablesc)
 
         else:
             print("No option given!")
@@ -401,9 +422,12 @@ def policy(address, port, username, password, insecure, format, list, verbose):
                 'ownerUsername': k['owner']['username'],
                 'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
                 'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+                'policyTemplateName': k['policyTemplate']['name'],
             } for k in scan_policies_on_tenablesc]
             if format == 'table':
-                print(dataframe_table(scan_policies_on_tenablesc))
+                print(dataframe_table(scan_policies_on_tenablesc), '\n')
+            elif format == 'csv':
+                print(dataframe_table(scan_policies_on_tenablesc).to_csv(), '\n')
             else:
                 print(scan_policies_on_tenablesc)
 
@@ -441,12 +465,16 @@ def credential(address, port, username, password, insecure, format, list, verbos
             credentials_on_tenablesc = [{
                 'id': k['id'],
                 'name': k['name'],
+                'type': k['type'],
+                'authType': k['typeFields']['authType'],
                 'ownerUsername': k['owner']['username'],
                 'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
                 'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
             } for k in credentials_on_tenablesc]
             if format == 'table':
-                print(dataframe_table(credentials_on_tenablesc))
+                print(dataframe_table(credentials_on_tenablesc), '\n')
+            elif format == 'csv':
+                print(dataframe_table(credentials_on_tenablesc).to_csv(), '\n')
             else:
                 print(credentials_on_tenablesc)
 
@@ -490,6 +518,8 @@ def role(address, port, username, password, insecure, format, list, verbose):
             } for k in roles_on_tenablesc]
             if format == 'table':
                 print(dataframe_table(roles_on_tenablesc), '\n')
+            elif format == 'csv':
+                print(dataframe_table(roles_on_tenablesc).to_csv(), '\n')
             else:
                 print(roles_on_tenablesc)
 
@@ -497,6 +527,52 @@ def role(address, port, username, password, insecure, format, list, verbose):
             print("No option given!")
 
         sccon.logout()
+
+@cli.command()
+@add_options(_login_options)
+@add_options(_general_options)
+@click.option('--list', is_flag=True,
+              help="Get audit files list")
+def audit_file(address, port, username, password, insecure, format, list, verbose):
+    """get Tenable.SC audit file info"""
+
+    for one_address in address:
+        one_password = password_check(one_address, username, password, verbose)
+
+        try:
+            sccon = TscApi(one_address, port, insecure)
+            sccon.login(username, one_password)
+        except ConnectionError as e:
+            print("Can't reach Tenable.sc API via {}. Please check your connection.".format(one_address))
+            sys.exit(1)
+
+        except CustomOAuth2Error as e:
+            print("Can't login to Tenable.sc API with supplied credentials. Please make sure they are correct.")
+            sys.exit(1)
+
+        if list:
+            print(one_address)
+            audit_files_on_tenablesc = sccon.audit_file_get()['response']['manageable']
+            audit_files_on_tenablesc = [{
+                'id': k['id'],
+                'name': k['name'],
+                'createdTime': datetime.datetime.fromtimestamp(int(k['createdTime'])),
+                'modifiedTime': datetime.datetime.fromtimestamp(int(k['modifiedTime'])),
+                'filename': k['filename'],
+                'originalFilename': k['originalFilename'],
+            } for k in audit_files_on_tenablesc]
+            if format == 'table':
+                print(dataframe_table(audit_files_on_tenablesc), '\n')
+            elif format == 'csv':
+                print(dataframe_table(audit_files_on_tenablesc).to_csv(), '\n')
+            else:
+                print(audit_files_on_tenablesc)
+
+        else:
+            print("No option given!")
+
+        sccon.logout()
+
 
 def main():
 
