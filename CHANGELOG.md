@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - to:
     - click>=8.1.8
     - keyring>=25.5.0
-    - pyTenable>=1.7.3
+    - pyTenable>=1.6.0
     - oauthlib>=3.2.2
     - pandas>=2.0.3
     - tabulate>=0.9.0
