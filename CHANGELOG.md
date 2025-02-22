@@ -5,6 +5,31 @@ All notable changes to [**TSCCM** *(Tenable.SC CLI Manager)* by LimberDuck][1] p
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4] - 2025-02-22
+
+### Changed
+
+- code formatted with [black](https://black.readthedocs.io)
+- requirements update
+  - from:
+    - click>=8.0.1
+    - keyring>=23.1.0
+    - pyTenable>=1.3.3
+    - oauthlib>=3.1.1
+    - pandas>=1.3.2
+    - tabulate>=0.8.9
+  - to:
+    - click>=8.1.8
+    - keyring>=25.5.0
+    - pyTenable>=1.6.0
+    - oauthlib>=3.2.2
+    - pandas>=2.0.3
+    - tabulate>=0.9.0
+
+- tests for python
+  - added: 3.10, 3.11, 3.12, 3.13
+  - removed: 3.7
+
 ## [0.0.3] - 2021-08-26
 
 ### Added
@@ -45,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+[0.0.4]: https://github.com/LimberDuck/tsccm/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/LimberDuck/tsccm/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/LimberDuck/tsccm/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/LimberDuck/tsccm/releases/tag/v0.0.1
