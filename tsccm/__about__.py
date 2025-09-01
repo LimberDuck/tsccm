@@ -42,7 +42,7 @@ __summary__ = (
     "by (C) Tenable, Inc. via Tenable Security Center API."
 )
 __uri__ = "https://github.com/LimberDuck"
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __release_date__ = "2025.09.01"
 __author__ = "Damian Krawczyk"
 __email__ = "damian.krawczyk@limberduck.org"
