@@ -2,7 +2,11 @@
 
 **TSCCM** *(Tenable.SC CLI Manager)* by LimberDuck is a CLI tool which enables you to perform certain actions on Tenable.SC by (C) Tenable, Inc. via [Tenable.SC API](https://docs.tenable.com/tenablesc/api).
 
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/tsccm?logo=PyPI)](https://pypi.org/project/tsccm/) [![License](https://img.shields.io/github/license/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm/blob/main/LICENSE) [![Repo size](https://img.shields.io/github/repo-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Code size](https://img.shields.io/github/languages/code-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Supported platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey.svg)](https://github.com/LimberDuck/tsccm)
+[![pepy - Downloads](https://img.shields.io/pepy/dt/tsccm?logo=PyPI)](https://pepy.tech/projects/tsccm) [![PyPI Downloads](https://static.pepy.tech/badge/tsccm/month)](https://pepy.tech/projects/tsccm)
+[![Latest Release version](https://img.shields.io/github/v/release/LimberDuck/tsccm?label=Latest%20release)](https://github.com/LimberDuck/tsccm/releases) 
+[![GitHub Release Date](https://img.shields.io/github/release-date/limberduck/tsccm?label=released&logo=GitHub)](https://github.com/LimberDuck/tsccm/releases)
+[![License](https://img.shields.io/github/license/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm/blob/main/LICENSE) [![Repo size](https://img.shields.io/github/repo-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Code size](https://img.shields.io/github/languages/code-size/LimberDuck/tsccm.svg)](https://github.com/LimberDuck/tsccm) [![Supported platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey.svg)](https://github.com/LimberDuck/tsccm)
+<!-- [![PyPI - Downloads](https://img.shields.io/pypi/dm/tsccm?logo=PyPI)](https://pypi.org/project/tsccm/) -->
 
 
 Main features

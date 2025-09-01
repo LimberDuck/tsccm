@@ -5,6 +5,14 @@ All notable changes to [**TSCCM** *(Tenable.SC CLI Manager)* by LimberDuck][1] p
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2025-09-01
+
+### Added
+
+- Requirements update
+  - new:
+    - packaging>=25.0
+
 ## [0.0.5] - 2025-09-01
 
 ### Added
@@ -13,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New option:
   - `tsccm --update-check` / `tsccm -u` - will return confirmation if you are using the latest version of TSCCM.
+
+### Changed
 
 - Requirements update
   - from:
