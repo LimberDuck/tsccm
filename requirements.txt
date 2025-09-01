@@ -1,7 +1,8 @@
 certstore>=0.0.2
-click>=8.1.8
-keyring>=25.5.0
-pyTenable>=1.6.0
-oauthlib>=3.2.2
-pandas>=2.0.3
+click>=8.2.1
+keyring>=25.6.0
+pyTenable>=1.8.3
+oauthlib>=3.3.1
+pandas>=2.3.2
 tabulate>=0.9.0
+requests>=2.32.5
