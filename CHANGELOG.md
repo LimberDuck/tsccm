@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - new:
     - requests>=2.32.5
 
+- tests for python
+  - removed: 3.8, 3.9
+
 ## [0.0.4] - 2025-02-22
 
 ### Changed
