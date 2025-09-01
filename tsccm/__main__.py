@@ -11,6 +11,8 @@ import sys
 from tenable.errors import ConnectionError
 from oauthlib.oauth2.rfc6749.errors import CustomOAuth2Error
 import datetime
+from tsccm import utilities
+from tsccm import __about__
 
 os_user = getpass.getuser().lower()
 
@@ -44,11 +46,7 @@ _login_options = [
         help="username which you want to use to login",
         show_default="current user",
     ),
-    click.option(
-        "--password",
-        "-p",
-        help="password which you want to use to login"
-    ),
+    click.option("--password", "-p", help="password which you want to use to login"),
     click.option(
         "--insecure",
         "-k",
@@ -178,30 +176,45 @@ def dataframe_table(data, sortby=None, groupby=None, tablefmt=None):
     return df
 
 
-@click.group()
-def cli():
-    pass
+PACKAGE_NAME = __about__.__package_name__
+
+
+@click.group(
+    invoke_without_command=True,
+    help="TSCCM - manages Tenable Security Center servers from command line",
+    epilog=f"Additional information:\n\n"
+    f"https://limberduck.org/en/latest/tools/{PACKAGE_NAME}\n"
+    f"https://github.com/LimberDuck/{PACKAGE_NAME}\n"
+    f"https://github.com/LimberDuck/{PACKAGE_NAME}/releases\n",
+)
+@click.version_option(
+    __version__, "--version", "-v", message=f"{PACKAGE_NAME} v.%(version)s"
+)
+@click.option(
+    "--update-check",
+    "-u",
+    is_flag=True,
+    help="Check if a new version is available and exit.",
+)
+@click.pass_context
+def cli(ctx, update_check):
+    if ctx.invoked_subcommand is None and not update_check:
+        click.echo(ctx.get_help())
+        ctx.exit(0)
+    if ctx.invoked_subcommand is None and update_check:
+        utilities.check_for_update()
 
 
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--status",
-    is_flag=True,
-    help="Get server status"
-)
+@click.option("--status", is_flag=True, help="Get server status")
 @click.option(
     "--ips",
     is_flag=True,
     help="Use to see number of licensed IPs, active IPs and left IPs",
 )
-@click.option(
-    "--version",
-    is_flag=True,
-    help="Get server version"
-)
-
+@click.option("--version", is_flag=True, help="Get server version")
 def server(
     address, port, username, password, insecure, format, status, ips, version, verbose
 ):
@@ -263,12 +276,7 @@ def server(
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get users list"
-)
-
+@click.option("--list", is_flag=True, help="Get users list")
 def user(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC user info"""
 
@@ -328,12 +336,7 @@ def user(address, port, username, password, insecure, format, list, verbose):
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get groups list"
-)
-
+@click.option("--list", is_flag=True, help="Get groups list")
 def group(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC group info"""
 
@@ -390,12 +393,7 @@ def group(address, port, username, password, insecure, format, list, verbose):
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get active scans list"
-)
-
+@click.option("--list", is_flag=True, help="Get active scans list")
 def scan(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC active scan info"""
 
@@ -459,12 +457,7 @@ def scan(address, port, username, password, insecure, format, list, verbose):
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get scans results list"
-)
-
+@click.option("--list", is_flag=True, help="Get scans results list")
 def scan_result(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC scan result info"""
 
@@ -533,12 +526,7 @@ def scan_result(address, port, username, password, insecure, format, list, verbo
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get scan policies list"
-)
-
+@click.option("--list", is_flag=True, help="Get scan policies list")
 def policy(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC policy info"""
 
@@ -596,12 +584,7 @@ def policy(address, port, username, password, insecure, format, list, verbose):
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get credentials list"
-)
-
+@click.option("--list", is_flag=True, help="Get credentials list")
 def credential(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC credential info"""
 
@@ -660,12 +643,7 @@ def credential(address, port, username, password, insecure, format, list, verbos
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get roles list"
-)
-
+@click.option("--list", is_flag=True, help="Get roles list")
 def role(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC role info"""
 
@@ -722,12 +700,7 @@ def role(address, port, username, password, insecure, format, list, verbose):
 @cli.command()
 @add_options(_login_options)
 @add_options(_general_options)
-@click.option(
-    "--list",
-    is_flag=True,
-    help="Get audit files list"
-)
-
+@click.option("--list", is_flag=True, help="Get audit files list")
 def audit_file(address, port, username, password, insecure, format, list, verbose):
     """get Tenable.SC audit file info"""
 

@@ -5,6 +5,31 @@ All notable changes to [**TSCCM** *(Tenable.SC CLI Manager)* by LimberDuck][1] p
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2025-09-01
+
+### Added
+
+#### CLI
+
+- New option:
+  - `tsccm --update-check` / `tsccm -u` - will return confirmation if you are using the latest version of TSCCM.
+
+- Requirements update
+  - from:
+    - click>=8.1.8
+    - keyring>=25.5.0
+    - pyTenable>=1.6.0
+    - oauthlib>=3.2.2
+    - pandas>=2.0.3
+  - to:
+    - click>=8.2.1
+    - keyring>=25.6.0
+    - pyTenable>=1.8.3
+    - oauthlib>=3.3.1
+    - pandas>=2.3.2
+  - new:
+    - requests>=2.32.5
+
 ## [0.0.4] - 2025-02-22
 
 ### Changed

@@ -1,0 +1,8 @@
+{
+    "virtualenvPath": "~/.virtualenvs/tsccm/bin",
+    "restructuredtext.confPath": "",
+    "python.pythonPath": "~/.virtualenvs/tsccm/bin/python",
+    "cSpell.words": [
+        "TSCCM"
+    ]
+}
