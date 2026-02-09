@@ -616,7 +616,7 @@ def credential(address, port, username, password, insecure, format, list, verbos
                     "id": k["id"],
                     "name": k["name"],
                     "type": k["type"],
-                    "authType": k["typeFields"]["authType"],
+                    "authType": k.get("typeFields", {}).get("authType", ""),
                     "ownerUsername": k["owner"]["username"],
                     "createdTime": datetime.datetime.fromtimestamp(
                         int(k["createdTime"])
